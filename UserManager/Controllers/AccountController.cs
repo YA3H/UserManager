@@ -47,8 +47,20 @@ namespace UserManager.Controllers
                 {
                     if (!_userService.IsExistPhone(login.Phone))
                     {
-                        _userService.AddUser(new RegisterUserViewModel { Phone = login.Phone, Name = "ثبت نشده", Family = "ثبت نشده" });
-                        _permissionService.AddRolesToUser(new List<int> { _permissionService.GetRoleIdByTitle("User") }, _userService.GetUserIDByPhone(login.Phone));
+                        _userService.AddUser(
+                            new RegisterUserViewModel
+                            {
+                                Phone = login.Phone,
+                                Name = "ثبت نشده",
+                                Family = "ثبت نشده"
+                            });
+                        
+                        _permissionService.AddRolesToUser(
+                            new List<int>
+                            {
+                                _permissionService.GetRoleIdByTitle("User")
+                            },  
+                            _userService.GetUserIDByPhone(login.Phone));
                     }
                     int UserID = _userService.GetUserIDByPhone(login.Phone);
 

@@ -9,6 +9,9 @@ namespace UserManager.Core.Generator
 {
     public class TimeChecker
     {
+        //نام متدها مبهم است!
+        //باید واضح باشه که چیو چک میکنه.
+        //(بدون دیدن کد)
         public static bool CheckMinutes(DateTime datetime, int min)
         {
             DateTime time = datetime.AddMinutes(min);

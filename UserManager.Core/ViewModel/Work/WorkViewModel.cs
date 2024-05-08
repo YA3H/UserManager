@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using UserManager.Core.ViewModel.Page;
 using UserManager.Core.ViewModel.User;
 
+//ViewModel?????
 namespace UserManager.Core.ViewModel.Work
 {
+
     public class CreateWorkViewModel
     {
         public string WorkName { get; set; }
@@ -82,7 +84,7 @@ namespace UserManager.Core.ViewModel.Work
         public int SupervisorId { get; set; }
         public int MyId { get; set; }
 
-        public List<UserInWorkViewModel> Users { get; set; }
+        public List<UserInWorkViewModel> Users { get; set; } = new List<UserInWorkViewModel>();
 
         public bool StartOrEnd { get; set; }
     }
@@ -103,7 +105,7 @@ namespace UserManager.Core.ViewModel.Work
         [Display(Name = "سازنده")]
         public string NameCreator { get; set; }
 
-        public List<UserInWorkAccountantViewModel> Users { get; set; }
+        public List<UserInWorkAccountantViewModel> Users { get; set; } = new List<UserInWorkAccountantViewModel>();
 
         public TimeSpan AllWorkTime { get; set; }
     }

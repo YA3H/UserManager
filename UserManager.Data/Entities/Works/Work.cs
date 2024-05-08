@@ -20,8 +20,9 @@ namespace UserManager.Data.Entities.Works
 
         #region Relations
 
-        public virtual List<UserWorks> UserWorks { get; set; }
-        public virtual List<WorkHours> WorkHours { get; set; }
+
+        public virtual List<UserWorks> UserWorks { get; set; } = new List<UserWorks>();//برای جلوگیری از نال رفرنس ارور
+        public virtual List<WorkHours> WorkHours { get; set; } = new List<WorkHours>();
 
 
         public int UserId { get; set; }

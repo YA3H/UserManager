@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UserManager.Core.Convertors;
+using UserManager.Core.Extensions;
 using UserManager.Core.Generator;
 using UserManager.Core.Interfaces;
 using UserManager.Core.ViewModel.User;
@@ -125,6 +126,11 @@ namespace UserManager.Core.Services
 
         public void UpdateUserInfo(RegisterUserViewModel User)
         {
+            //برای آپدیت بهتره با 
+            //UserId 
+            //آبجکت کاربر رو از دیتابیس بیگیریم 
+            //سربارش روی دیتابیس خیلی کمتره تا استرینگ
+            //البته این هم درسته
             User update = GetUserById(GetUserIDByPhone(User.Phone));
             update.Name = User.Name;
             update.Family = User.Family;
@@ -136,46 +142,76 @@ namespace UserManager.Core.Services
         public ListUserViewModel GetUserList(int Take, int Page, bool SortDesc, string Sort, string Search)
         {
             int Skip = (Page - 1) * Take;
-            Func<User, object> UserSort(string field)
-            {
-                return (field) switch
-                {
-                    nameof(User.Phone) => p => p.Phone,
-                    nameof(User.Name) => p => p.Name,
-                    nameof(User.Family) => p => p.Family,
-                    nameof(User.RegisterDate) => p => p.RegisterDate,
-                    _ => p => p.Phone,
-                };
-            }
-            IQueryable<User> result = _context.Users;
-            result = result.Where(s => Search != null ? (
-              s.Name.ToLower().Contains(Search.ToLower()) ||
-              s.Family.ToLower().Contains(Search.ToLower()) ||
-              s.Phone.ToLower().Contains(Search.ToLower())) : true);
+
+            //برای مرتب و خوانا بودن کد بهتره از یه 
+            //ExtensionMethod 
+            //یا متد 
+            //static
+            //استفاده بشه
+
+            //Func<User, object> UserSort(string field)
+            //{
+            //    return (field) switch
+            //    {
+            //        nameof(User.Phone) => p => p.Phone,
+            //        nameof(User.Name) => p => p.Name,
+            //        nameof(User.Family) => p => p.Family,
+            //        nameof(User.RegisterDate) => p => p.RegisterDate,
+            //        _ => p => p.Phone,
+            //    };
+            //}     
+
+
+            //IQueryable<User> result = _context.Users;
+            //result = result.Where(s => Search != null ? (
+            //  s.Name.ToLower().Contains(Search.ToLower()) ||
+            //  s.Family.ToLower().Contains(Search.ToLower()) ||
+            //  s.Phone.ToLower().Contains(Search.ToLower())) : true); 
+
+            var result = _context.Users.
+                Where(s => string.IsNullOrWhiteSpace(Search) ||
+                    (
+                        s.Name.Contains(Search, StringComparison.OrdinalIgnoreCase) ||
+                        s.Family.Contains(Search, StringComparison.OrdinalIgnoreCase) ||
+                        s.Phone.Contains(Search) //no need to ToLower() for numbers
+                    ));
+
 
             ListUserViewModel list = new ListUserViewModel();
             list.Page.Count = result.Count();
             if (SortDesc)
             {
-                list.Users = result.OrderByDescending(UserSort(Sort)).Skip(Skip).Take(Take).Select(u => new OneUserViewModel()
-                {
-                    Name = u.Name,
-                    Family = u.Family,
-                    Phone = u.Phone,
-                    RegisterDate = u.RegisterDate,
-                    UserId = u.UserId
-                }).ToList();
+
+                //static
+                list.Users = result
+                    .OrderByDescending(UserQueryExtensions.UserSortExtension(Sort))
+                    .Skip(Skip)
+                    .Take(Take)
+                    .Select(u => new OneUserViewModel()
+                    {
+                        Name = u.Name,
+                        Family = u.Family,
+                        Phone = u.Phone,
+                        RegisterDate = u.RegisterDate,
+                        UserId = u.UserId
+                    })
+                    .ToList();
             }
             else
             {
-                list.Users = result.OrderBy(UserSort(Sort)).Skip(Skip).Take(Take).Select(u => new OneUserViewModel()
-                {
-                    Name = u.Name,
-                    Family = u.Family,
-                    Phone = u.Phone,
-                    RegisterDate = u.RegisterDate,
-                    UserId = u.UserId
-                }).ToList();
+                //extension method
+                list.Users = result
+                    .UserOrderByExtension(Sort)
+                    .Skip(Skip)
+                    .Take(Take)
+                    .Select(u => new OneUserViewModel()
+                    {
+                        Name = u.Name,
+                        Family = u.Family,
+                        Phone = u.Phone,
+                        RegisterDate = u.RegisterDate,
+                        UserId = u.UserId
+                    }).ToList();
             }
             list.Page.CurrentPage = Page;
             list.Page.Search = Search;
@@ -214,7 +250,7 @@ namespace UserManager.Core.Services
                 Token = Guid.NewGuid().ToString(),
                 ActiveCodeDate = DateTime.Now,
                 IsDelete = false,
-                HeaderImage = "Header.jpg",
+                HeaderImage = "Header.jpg", //عکس هدر از فرانت نمیاد!
 
                 Avatar = ImageConvertor.GetBytes(user.Avatar),
 
@@ -222,7 +258,7 @@ namespace UserManager.Core.Services
 
             #region Save Header
 
-            if (user.HeaderImage != null)
+            if (user.HeaderImage != null) //در اینجا همیشه درسته
             {
                 string imagePath = "";
                 addUser.HeaderImage = NameGenerator.GenerateUniqCode() + Path.GetExtension(user.HeaderImage.FileName);
@@ -251,7 +287,7 @@ namespace UserManager.Core.Services
                     Family = u.Family,
                     Name = u.Name,
                     Phone = u.Phone,
-                    HeaderImage = u.HeaderImage,
+                    HeaderImage = u.HeaderImage, //****
                     UserRoles = u.UserRoles.Select(r => r.RoleId).ToList()
                 }).Single();
         }
@@ -265,6 +301,8 @@ namespace UserManager.Core.Services
             user.Family = EditUser.Family;
             if (EditUser.HeaderImageFile != null)
             {
+                //????
+                //دلیل این شرط چیه؟
                 if (EditUser.HeaderImage != "Header.jpg")
                 {
                     string deletePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserAvatar", EditUser.HeaderImage);
@@ -273,14 +311,25 @@ namespace UserManager.Core.Services
                         File.Delete(deletePath);
                     }
                 }
+
+                // وجود فایل چک نشده، هر چند احتمالش کمه
+                // بین اسم فایل و اکستنشن نقطه نیست
                 user.HeaderImage = NameGenerator.GenerateUniqCode() + Path.GetExtension(EditUser.HeaderImageFile.FileName);
+
+                //Directory.GetCurrentDirectory() 
+                //برای زمانی خوبه که فرانت و بک کنار هم باشند.
+                //اگر جدا باشه اونجا که **** گذاشتم به مشکل برمی‌خوریم
+                // اگه برنامه روی سرور باشه ادرس عکس شبیه این میشه:
+                //D://hosting/usermanager/wwwroot/useravatar
+
+                //توی اونجا که **** گذاشتم هم فقط اسم فایل داره میاد در نتیجه برنامه هیچ دیدی نداره که چیو برگردونه
                 string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserAvatar", user.HeaderImage);
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
                     EditUser.HeaderImageFile.CopyTo(stream);
                 }
             }
-            if (EditUser.Avatar!=null)
+            if (EditUser.Avatar != null)
             {
                 user.Avatar = ImageConvertor.GetBytes(EditUser.Avatar);
             }
@@ -291,14 +340,38 @@ namespace UserManager.Core.Services
         public void DeleteUser(int userId)
         {
             User user = GetUserById(userId);
+            //اگه یوزر نال بود؟
             user.IsDelete = true;
             UpdateUser(user);
         }
 
-        public async Task<List<UserInWorkViewModel>> GetAllUserForWorks()
+        public Task<List<UserInWorkViewModel>> GetAllUserForWorks()
         {
-            return await Task.FromResult(await _context.Users
-                .Select(u => new UserInWorkViewModel() { UserId =u.UserId, Name = u.Name, Family = u.Family }).ToListAsync());
+            // چرا هم 
+            //await 
+            //و هم 
+            //FromResult ???
+
+            //return await Task.FromResult(await _context.Users
+            //    .Select(u => new UserInWorkViewModel() { UserId = u.UserId, Name = u.Name, Family = u.Family }).ToListAsync());
+
+
+            //اگه فقط یه متد 
+            //awaitable 
+            //بود، خود 
+            //Task 
+            // رو برمیگردونیم
+            // متد هم نیازی یه 
+            //async 
+            //نداره
+            return _context.Users
+                .Select(u => new UserInWorkViewModel()
+                {
+                    UserId = u.UserId,
+                    Name = u.Name,
+                    Family = u.Family
+                })
+                .ToListAsync();
         }
     }
 }

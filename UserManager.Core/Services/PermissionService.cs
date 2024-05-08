@@ -47,7 +47,11 @@ namespace UserManager.Core.Services
 
         public int GetRoleIdByTitle(string RoleTitle)
         {
-            return _context.Roles.LastOrDefault(u => u.RoleTitle == RoleTitle).RoleId;
+            var role = _context.Roles
+                .OrderByDescending(x => x.RoleId)
+                .FirstOrDefault(u => u.RoleTitle == RoleTitle);
+
+            return role?.RoleId ?? throw new Exception("Role not found!");
         }
 
 

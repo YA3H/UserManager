@@ -24,13 +24,15 @@ namespace UserManager.Data.Context
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
 
-        public DbSet<Work> Work { get; set; }
+        //Works
+        public DbSet<Work> Work { get; set; } 
         public DbSet<UserWorks> UserWorks { get; set; }
         public DbSet<WorkHours> WorkHours { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
+            //این هم توی تلگرام توضیح بده. جالب بود!
             var cascadeFKs = modelBuilder.Model.GetEntityTypes()
                .SelectMany(t => t.GetForeignKeys())
                .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);

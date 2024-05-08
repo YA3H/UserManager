@@ -30,6 +30,8 @@ namespace UserManager.Core.Services
 
         private void UpdateWork(Work work)
         {
+            //استفاده از این متد خطرناکه.
+            //مخصوصا زمانی که پراپرتی زمان داشته باشیم
             _context.Update(work);
             _context.SaveChanges();
         }
@@ -37,7 +39,6 @@ namespace UserManager.Core.Services
 
         public async Task<int> AddWork(CreateWorkViewModel work)
         {
-
             Work model = new Work()
             {
                 WorkName = work.WorkName,
@@ -52,20 +53,65 @@ namespace UserManager.Core.Services
 
         public async Task AddWorkUsers(int workId, List<int> users, int? SupervisorId)
         {
-            List<SetSupervisorViewModel> Supervisor = new List<SetSupervisorViewModel>();
-            foreach (var user in users)
-            {
-                Supervisor.Add(await _context.UserRoles.Include(u => u.User).Include(u => u.Role).Where(u => u.UserId == user)
-                   .Select(u => new SetSupervisorViewModel() { UserId = u.UserId, Rank = u.Role.Rank, RegisterDate = u.User.RegisterDate }).FirstOrDefaultAsync());
-            }
-            Supervisor.OrderBy(s => s.RegisterDate).OrderBy(s => s.Rank);
-            foreach (var item in Supervisor)
+
+            //نامگذاری مشکل داره
+            //List<SetSupervisorViewModel> Supervisor = new List<SetSupervisorViewModel>();
+
+            //نیازی به حقه نیست
+            //foreach (var user in users)
+            //{
+
+            //خیلی نا خوانا هست
+            //اگر رول ها به ترتیب ثبت نشده باشند امکان دریافت رنک اشتباه هست مثلا ترتیب ثبت رنک اینجوری ثبت شده باشه
+            // 2 5 3
+            //بجای اینکه 5 بده 2 میده
+            //    Supervisor.Add(await _context.UserRoles.Include(u => u.User).Include(u => u.Role).Where(u => u.UserId == user)
+            //       .Select(u => new SetSupervisorViewModel() { UserId = u.UserId, Rank = u.Role.Rank, RegisterDate = u.User.RegisterDate }).FirstOrDefaultAsync());
+            //}
+
+            //دوتا اوردر بای نمیشه 
+            // قشنگ معلومه تازه از خدمت اومدی!! اول تاریخ ثبت نام رو گذاشتی بعد رول رو. درجه مهم تر
+            // :))))))
+            //Supervisor.OrderBy(s => s.RegisterDate).OrderBy(s => s.Rank);
+
+
+
+
+            var workers = await _context.Users //operators | users 
+                .Include(u => u.UserRoles)
+                .Where(x => users.Contains(x.UserId))
+                .Select(u => new SetSupervisorViewModel()
+                {
+                    UserId = u.UserId,
+                    Rank = u.UserRoles.Any() ? u.UserRoles.Min(x => x.Role.Rank) : 9999,
+                    RegisterDate = u.RegisterDate
+                })
+                .OrderBy(x => x.Rank)
+                .OrderBy(x => x.RegisterDate)
+                .ToListAsync();
+
+            //چون به ترتیبِ تاریخ و رنک مرتب کردیم همیشه اولین نفر سرپرسته, مگر از قبل تعیین شده باشه.
+            SupervisorId ??= workers.FirstOrDefault().UserId;
+            //؟؟=
+            //یعنی اگر 
+            //SupervisorId == null
+            //بود
+            //مقدار 
+            //workers.FirstOrDefault().UserId
+            //رو بهش تخصیص بده
+
+            foreach (var worker in workers)
             {
                 await _context.UserWorks.AddAsync(new UserWorks()
                 {
-                    UserId = item.UserId,
+                    UserId = worker.UserId,
                     WorkId = workId,
-                    Supervisor = SupervisorId == null ? (item.UserId == Supervisor.FirstOrDefault().UserId ? true : false) : (item.UserId == SupervisorId ? true : false)
+                    Supervisor = SupervisorId == worker.UserId
+                    //UserId = item.UserId,
+                    //WorkId = workId,
+                    //Supervisor = SupervisorId == null ?
+                    //         (item.UserId == Supervisor.FirstOrDefault().UserId ? true : false) :
+                    //         (item.UserId == SupervisorId ? true : false)
                 });
             }
             await _context.SaveChangesAsync();
@@ -78,10 +124,30 @@ namespace UserManager.Core.Services
             UpdateWork(model);
         }
 
-        public async Task<List<UserInWorkViewModel>> GetUserWorks(int WorkId)
+        public Task<List<UserInWorkViewModel>> GetUserWorks(int WorkId)
         {
-            return await Task.FromResult(await _context.UserWorks.Include(w => w.User).Where(w => w.WorkId == WorkId)
-                .Select(w => new UserInWorkViewModel() { UserId = w.UserId, Name = w.User.Name, Family = w.User.Family, Supervisor = w.Supervisor }).ToListAsync());
+            //نیازی به
+            //await Task.FromResult
+            //و 
+            //async
+            //نیست
+            //رجوع شود به GetAllUserForWorks
+
+            //return await Task.FromResult(await _context.UserWorks.Include(w => w.User).Where(w => w.WorkId == WorkId)
+            //    .Select(w => new UserInWorkViewModel() { UserId = w.UserId, Name = w.User.Name, Family = w.User.Family, Supervisor = w.Supervisor }).ToListAsync());
+
+
+            return _context.UserWorks
+                .Include(w => w.User)
+                .Where(w => w.WorkId == WorkId)
+                .Select(w => new UserInWorkViewModel()
+                {
+                    UserId = w.UserId,
+                    Name = w.User.Name,
+                    Family = w.User.Family,
+                    Supervisor = w.Supervisor
+                })
+                .ToListAsync();
 
         }
 
@@ -101,6 +167,8 @@ namespace UserManager.Core.Services
 
         public async Task<ListWorkViewModel> GetWorkList(int Take, int Page, bool SortDesc, string Sort, string Search)
         {
+            //رجوع شود به GetUserList
+
             int Skip = (Page - 1) * Take;
             Func<Work, object> WorkSort(string field)
             {
@@ -163,6 +231,7 @@ namespace UserManager.Core.Services
                .ToList().ForEach(w => _context.UserWorks.Remove(w));
 
             await AddWorkUsers(WorkId, Users, SupervisorId);
+            //آپدیت موفقیت آمیز بود؟ نبود؟
         }
 
         public async Task UpdateWork(EditWorkViewModel work)
@@ -176,29 +245,73 @@ namespace UserManager.Core.Services
 
         public async Task<List<MyWorksViewModel>> GetMyWorks(int UserId)
         {
-            List<Work> model = await _context.UserWorks.Include(i => i.User).Include(i => i.Work).ThenInclude(i => i.UserWorks).Where(w => w.UserId == UserId && w.Work.IsEnd == false).Select(s => s.Work).ToListAsync();
-            foreach (var item in model)
-            {
-                item.WorkHours = await _context.WorkHours.Where(w => w.WorkId == item.WorkId).ToListAsync();
-                item.UserWorks = await _context.UserWorks.Include(i => i.User).Where(w => w.WorkId == item.WorkId).ToListAsync();
-            }
-            List<MyWorksViewModel> myWorks = model.Select(s => new MyWorksViewModel()
-            {
-                WorkId = s.WorkId,
-                WorkName = s.WorkName,
-                Description = s.Description,
-                MyId = UserId,
-                Users = s.UserWorks.Select(s => new UserInWorkViewModel()
-                {
-                    UserId = s.UserId,
-                    Name = s.User.Name,
-                    Family = s.User.Family
-                }).ToList(),
-                SupervisorId = s.UserWorks.Where(w => w.Supervisor == true).FirstOrDefault().UserId,
-                StartOrEnd = s.WorkHours.Where(w => w.UserId == UserId && w.IsEnd == false).Any()
-            }).ToList();
+            //List<Work> model = await _context.UserWorks
+            //    .Include(i => i.User)
+            //    .Include(i => i.Work)
+#warning ReadThis
+            //    //.ThenInclude(i => i.UserWorks)//دوباره خودش رو اینکلود چرا؟؟؟
+            //    .Where(w => w.UserId == UserId && w.Work.IsEnd == false)
+            //    .Select(s => s.Work)
+            //    .ToListAsync();
 
-            return await Task.FromResult(myWorks);
+            //foreach (var item in model)
+            //{
+            //    item.WorkHours = await _context.WorkHours.Where(w => w.WorkId == item.WorkId).ToListAsync();
+            //    item.UserWorks = await _context.UserWorks.Include(i => i.User).Where(w => w.WorkId == item.WorkId).ToListAsync();
+            //}
+            //List<MyWorksViewModel> myWorks = model.Select(s => new MyWorksViewModel()
+            //{
+            //    WorkId = s.WorkId,
+            //    WorkName = s.WorkName,
+            //    Description = s.Description,
+            //    MyId = UserId,
+            //    Users = s.UserWorks.Select(s => new UserInWorkViewModel()
+            //    {
+#warning ReadThis
+            //
+            //        UserId = s.UserId,  // چرا
+            //        S.userId
+            //        با یوزر آی دی بالای قاطی میشه 
+            //        
+            //        Name = s.User.Name,
+            //        Family = s.User.Family
+            //    }).ToList(),
+            //    SupervisorId = s.UserWorks.Where(w => w.Supervisor == true).FirstOrDefault().UserId,
+            //    StartOrEnd = s.WorkHours.Where(w => w.UserId == UserId && w.IsEnd == false).Any()
+            //}).ToList();
+
+            //return await Task.FromResult(myWorks);
+
+            var works = await _context.Work
+                .Include(i => i.UserWorks)
+                .ThenInclude(i => i.User)
+                .Include(i => i.WorkHours)
+                .Where(w => !w.IsEnd && w.UserWorks.Any(x => x.UserId == UserId))
+                .ToListAsync();
+
+            return works
+                .Select(x => new MyWorksViewModel
+                {
+                    WorkId = x.WorkId,
+                    WorkName = x.WorkName,
+                    Description = x.Description,
+                    MyId = UserId,
+                    Users = x.UserWorks
+                            .Select(s => new UserInWorkViewModel()
+                            {
+                                UserId = s.UserId,
+                                Name = s.User.Name,
+                                Family = s.User.Family
+                            })
+                            .ToList(),
+                    SupervisorId = x.UserWorks.Any(y => y.Supervisor) ?
+                                   x.UserWorks.FirstOrDefault(w => w.Supervisor == true).UserId :
+                                   x.UserWorks.FirstOrDefault().UserId,
+
+                    //اینو نفهمیدم چیه دیدی تو تلگرام بفرست چیه؟
+                    StartOrEnd = x.WorkHours.Any(w => w.UserId == UserId && w.IsEnd == false)
+                })
+                .ToList();
         }
 
         public async Task WorkAddTime(int WorkId, int UserId)
