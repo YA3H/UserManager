@@ -1,0 +1,98 @@
+﻿@model UserManager.Core.ViewModel.Work.EditWorkViewModel
+@using UserManager.Core.ViewModel.User
+@{
+    ViewData["Title"] = "ویرایش کار";
+    ViewData["Panel"] = "Work";
+    Layout = "~/Areas/Admin/Views/Shared/_DefaultLayout.cshtml";
+    List<UserInWorkViewModel> Users = ViewData["Users"] as List<UserInWorkViewModel>;
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="lh-1-85 breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Admin/Dashboard">خانه</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Admin/Works">کارها</a>
+        </li>
+        <li class="breadcrumb-item active">ویرایش کار </li>
+    </ol>
+</nav>
+<form asp-action="EditWork" method="post" enctype="multipart/form-data">
+    <div class="row">
+
+        <div class="col-md-12 col-12">
+            <div class="card">
+                <h5 class="card-header heading-color">مشخصات کار</h5>
+                <div class="card-body">
+
+                    <input asp-for="WorkId" value="@Model.WorkId" type="hidden">
+                    <div class="mb-3">
+                        <label class="form-label">عنوان</label>
+                        <input asp-for="WorkName" value="@Model.WorkName" type="text" class="form-control" placeholder="عنوان کار را وارد کنید" aria-describedby="defaultFormControlHelp">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">توضیحات</label>
+                        <textarea asp-for="Description" value="@Model.Description" type="text" class="form-control" placeholder="توضیحات کار را وارد کنید" aria-describedby="defaultFormControlHelp"></textarea>
+                    </div>
+
+
+                </div>
+
+                <h5 class="card-header heading-color">کاربران </h5>
+                <div class="card-body">
+
+                    @foreach (var item in Users)
+                    {
+                        <div class="form-check form-check-secondary mt-3">
+                            <input class="form-check-input" type="checkbox" name="SelectedUsers" @((Model.Users.Any(p => p == item.UserId) ? "checked" : "")) value="@item.UserId">
+                            <label class="form-check-label">@(item.Name +" "+item.Family)</label>
+                        </div>
+                    }
+                </div>
+
+                <h5 class="card-header heading-color">سرپرست </h5>
+                <div class="card-body">
+
+                    <div class="dropdown bootstrap-select show-tick w-100 dropup">
+
+                        <select id="SupervisorId" name="SupervisorId" class="selectpicker w-100" data-style="btn-default" ata-actions-box="true" tabindex="null">
+                            <option value="">خالی</option>
+
+                            @foreach (var item in Users)
+                            {
+                                if (Model.SupervisorId == item.UserId)
+                                {
+                                    <option selected value="@item.UserId"> @(item.Name +" "+item.Family) </option>
+                                }
+                                else
+                                {
+                                    <option value="@item.UserId"> @(item.Name +" "+item.Family) </option>
+                                }
+
+                            }
+                        </select>
+                    </div>
+                    <span>*در صورت عدم انتخاب بالاترین نقش به عنوان سرپرست درنظر گرفته میشود</span>
+
+
+                </div>
+
+
+
+                <div class="card-body">
+
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-primary">ثبت</button>
+                        <a href="/Admin/Works" class="btn btn-primary">انصراف</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</form>

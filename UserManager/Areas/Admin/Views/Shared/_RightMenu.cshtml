@@ -1,0 +1,45 @@
+﻿<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+        <a href="Index.html" class="app-brand-link">
+            <span class="app-brand-logo demo">
+                logo
+            </span>
+            <span class="app-brand-text demo menu-text fw-bold ms-2">هزار و یک</span>
+        </a>
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+            <i class="bx menu-toggle-icon d-none d-xl-block fs-4 align-middle"></i>
+            <i class="bx bx-x d-block d-xl-none bx-sm align-middle"></i>
+        </a>
+    </div>
+    <div class="menu-divider mt-0"></div>
+    <div class="menu-inner-shadow"></div>
+    <ul class="menu-inner py-1">
+
+        <li class="menu-item @((ViewData["Panel"].ToString()=="Dashboard"?"active":"")) ">
+            <a href="/Admin" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Page 1">داشبورد</div>
+            </a>
+        </li>
+        <li class="menu-item @((ViewData["Panel"].ToString()=="User"?"active":""))">
+            <a href="/Admin/Users" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div data-i18n="Page 2">کاربران</div>
+            </a>
+        </li>
+
+        <li class="menu-item @((ViewData["Panel"].ToString()=="Role"?"active":""))">
+            <a href="/Admin/Roles" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-shield"></i>
+                <div data-i18n="Page 2">نقش ها</div>
+            </a>
+        </li>
+
+        <li class="menu-item @((ViewData["Panel"].ToString()=="Work"?"active":""))">
+            <a href="/Admin/Works" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-briefcase"></i>
+                <div data-i18n="Page 2">کار ها</div>
+            </a>
+        </li>
+    </ul>
+</aside>

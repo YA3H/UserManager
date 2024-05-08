@@ -1,0 +1,99 @@
+﻿@model UserManager.Core.ViewModel.Work.WorkAccountantViewModel
+@using UserManager.Core.Convertors
+@{
+    ViewData["Title"] = "حسابرسی کارها";
+    ViewData["Panel"] = "Work";
+    Layout = "~/Areas/Admin/Views/Shared/_DefaultLayout.cshtml";
+}
+<nav aria-label="breadcrumb">
+    <ol class="lh-1-85 breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Admin/Dashboard">خانه</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Admin/Works">کارها</a>
+        </li>
+        <li class="breadcrumb-item active">حسابرسی کارها</li>
+    </ol>
+</nav>
+
+<div class="col-xl-6 col-lg-6 col-md-6">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="user-avatar-section">
+                <div class="d-flex align-items-center flex-column">
+                    <div class="user-info text-center">
+                        <h5 class="mb-2">@Model.WorkName</h5>
+                        <span class="badge bg-label-secondary">@Model.Description</span>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="pb-2 border-bottom mb-4 secondary-font">جزئیات</h5>
+            <div class="info-container">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <span class="fw-bold me-2">عنوان:</span>
+                        <span>@Model.WorkName</span>
+                    </li>
+                    <li class="mb-3">
+                        <span class="fw-bold me-2">توضیحات:</span>
+                        <span>@Model.Description</span>
+                    </li>
+                    <li class="mb-3">
+                        <span class="fw-bold me-2">سرپرست:</span>
+                        <span>@Model.NameSupervisor</span>
+                    </li>
+                    <li class="mb-3">
+                        <span class="fw-bold me-2">سازنده:</span>
+                        <span>@Model.NameCreator</span>
+                    </li>
+                </ul>
+                <div class="d-flex justify-content-center pt-3">
+                    <a href="/Admin/Works" class="btn btn-primary">بازگشت به لیست</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-xl-6 col-lg-6 col-md-6">
+    <div class="card">
+        <div class="card-header"><h5 class="mb-0">فعالیت کاربران</h5></div>
+        <div class="table-responsive">
+            <table class="table border-top">
+                <thead>
+                    <tr>
+                        <th class="">کاربر</th>
+                        <th class="text-center">مجموع ساعت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Users)
+                    { 
+                        <tr>
+                            <td>
+                                <div class="d-flex  flex-wrap">
+                                    <div class="avatar avatar-xs me-2">
+                                        <img src="@((ImageConvertor.ByteToImage(item.AvatarByte)))" alt="آواتار" class="rounded-circle">
+                                    </div>
+
+                                    <span class="">@item.Name @item.Family</span>
+                                </div>
+                            </td>
+                            <td class="text-center"><h5>@((item.WorkTime.ToString(@"hh\:mm\:ss")))</h5></td>
+                        </tr>
+                    }
+
+                    <tr class="table-primary">
+                        <td class="text-truncate">
+                            <i class="bx bx-timer text-danger me-3"></i>
+                            <span class="fw-semibold">جمع:</span>
+                        </td>
+                        <td class="text-center"><h5>@((Model.AllWorkTime.ToString(@"hh\:mm\:ss")))</h5></td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

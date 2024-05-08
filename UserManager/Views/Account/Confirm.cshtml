@@ -1,0 +1,100 @@
+﻿@model UserManager.Core.ViewModel.User.ConfirmViewModel
+@{
+    ViewData["Title"] = "تایید شماره تلفن";
+    Layout = "~/Views/Shared/Account/_AccountLayout.cshtml";
+}
+
+@if (ViewBag.ReSend == true)
+{
+    <div class="alert alert-warning">
+        پیامک تایید، مجدد برای شما ارسال شد!
+    </div>
+}
+<p class="text-start mb-4 text-center">
+
+    کد تایید برای شماره
+    <span>
+        @Model.Phone
+    </span>
+    پیامک شد
+</p>
+<p class="mb-0 fw-semibold">کد 6 رقمی پیامک شده را وارد کنید</p>
+
+
+<form asp-action="Confirm" method="post">
+    <div class="mb-3">
+        <div class="auth-input-wrapper d-flex align-items-center justify-content-sm-between numeral-mask-wrapper">
+            <input onchange="SumInp()" id="A1" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1" autofocus>
+            <input onchange="SumInp()" id="A2" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1">
+            <input onchange="SumInp()" id="A3" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1">
+            <input onchange="SumInp()" id="A4" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1">
+            <input onchange="SumInp()" id="A5" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1">
+            <input onchange="SumInp()" id="A6" type="text" class="form-control auth-input h-px-50 text-center numeral-mask text-center h-px-50 mx-1 my-2" maxlength="1">
+        </div>
+        <input id="ActiveCode" asp-for="ActiveCode" type="hidden">
+        <input asp-for="Phone" type="hidden" value="@Model.Phone">
+        <input asp-for="ActiveCodeDate" type="hidden" value="@Model.ActiveCodeDate">
+    </div>
+    <span asp-validation-for="ActiveCode" class="text-danger text-center"></span>
+    <span asp-validation-for="Phone" class="text-danger text-center"></span>
+    <button class="btn rounded-pill btn-dark d-grid w-100 mb-3">تایید</button>
+    <div class="text-center" id="success" hidden>
+        کد را دریافت نکردید؟
+        <a class="text-warning" href="/Confirm/ReSend/@Model.Token/@Model.RememberMe"> ارسال دوباره </a>
+    </div>
+</form>
+
+<div class="text-center" id="timer">
+    <span class="text"> زمان باقیمانده :</span>
+    <span id="seconds">00</span>
+    <span class="dot">:</span>
+    <span id="minutes">0</span>
+</div>
+
+
+@section Scripts
+{
+    <script>
+
+    function SumInp() {
+        document.getElementById('ActiveCode').value = document.getElementById('A1').value +
+    document.getElementById('A2').value +
+    document.getElementById('A3').value +
+    document.getElementById('A4').value +
+    document.getElementById('A5').value +
+        document.getElementById('A6').value ;
+    }
+    var minutes;
+    var seconds;
+    var set_inteval;
+    function otp_timer() {
+        seconds -= 1;
+        document.getElementById('seconds').innerHTML = seconds;
+        document.getElementById('minutes').innerHTML = minutes;
+        if (seconds == 0) {
+            if (minutes > 0) {
+                seconds = 60;
+                minutes -= 1;
+            } else {
+                minutes = 0;
+                document.getElementById('minutes').innerHTML = minutes;
+                clearInterval(set_inteval);
+                minutes = 0;
+                seconds = 0;
+                document.getElementById('seconds').innerHTML = '00';
+                document.getElementById('minutes').innerHTML = '0';
+                document.querySelector('#success').hidden=false;
+                document.querySelector('#timer').hidden=true;
+            }
+        }
+    }
+    function startTimer() {
+        minutes = @ViewBag.Min;
+        seconds = @ViewBag.Sec;
+        document.getElementById('seconds').innerHTML = seconds;
+        document.getElementById('minutes').innerHTML = minutes;
+        set_inteval = setInterval( 'otp_timer()', 1000 );
+    }
+    startTimer();
+    </script>
+}

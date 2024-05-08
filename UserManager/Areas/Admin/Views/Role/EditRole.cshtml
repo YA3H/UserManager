@@ -1,0 +1,89 @@
+﻿@model UserManager.Core.ViewModel.Permissions.OneRoleViewModel
+@using UserManager.Core.ViewModel.Permissions
+@{
+    ViewData["Title"] = "ویرایش نقش";
+    ViewData["Panel"] = "Role";
+    Layout = "~/Areas/Admin/Views/Shared/_DefaultLayout.cshtml";
+    List<OnePermissionViewModel> permissions = ViewData["Permissions"] as List<OnePermissionViewModel>;
+    List<int> SelectedPermissions = ViewData["SelectedPermissions"] as List<int>;
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="lh-1-85 breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Admin/Dashboard">خانه</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Admin/Roles">نقش ها</a>
+        </li>
+        <li class="breadcrumb-item active">ویرایش نقش </li>
+    </ol>
+</nav>
+<form asp-action="EditRole" method="post">
+    <div class="row">
+
+        <div class="col-md-8 col-12">
+            <div class="card">
+                <h5 class="card-header heading-color">ویرایش نقش</h5>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">نام</label>
+                        <input asp-for="RoleTitle" value="@Model.RoleTitle" type="text" class="form-control" placeholder="نام نقش را وارد کنید" aria-describedby="defaultFormControlHelp">
+                        <input type="hidden" asp-for="RoleId" value="@Model.RoleId" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">رتبه (رتبه بالاتر به عدد 1 نزدیک تر است)</label>
+                        <input asp-for="Rank" va min="1" max="100" type="number" class="form-control" id="defaultFormControlInput" placeholder="رتبه نقش را وارد کنید" aria-describedby="defaultFormControlHelp" value="@Model.Rank">
+                        <span>رتبه بالاتر به عدد 1 نزدیک تر است</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">ثبت</button>
+                            <a href="/Admin/Roles" class="btn btn-primary">انصراف</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-12">
+            <div class="card mb-md-0 mb-4">
+                <h5 class="card-header heading-color">ویرایش دسترسی های نقش</h5>
+                <div class="card-body">
+
+
+                    @foreach (var permission in permissions.Where(p => p.ParentID == null))
+                    {
+                        <div class="form-check form-check-secondary mt-3">
+                            <input class="form-check-input" @((SelectedPermissions.Any(p => p == permission.PermissionId) ? "checked" : "")) type="checkbox" name="SelectedPermission" value="@permission.PermissionId" id="customCheckPrimary">
+                            <label class="form-check-label">@permission.PermissionTitle</label>
+
+                            @if (permissions.Any(p => p.ParentID == permission.ParentID))
+                            {
+                                @foreach (var sub in permissions.Where(p => p.ParentID == permission.PermissionId))
+                                {
+                                    <div class="form-check form-check-secondary mt-3">
+                                        <input class="form-check-input" @((SelectedPermissions.Any(p => p == sub.PermissionId) ? "checked" : "")) type="checkbox" name="SelectedPermission" value="@sub.PermissionId" id="customCheckPrimary">
+                                        <label class="form-check-label">@sub.PermissionTitle</label>
+
+                                        @if (permissions.Any(p => p.ParentID == sub.ParentID))
+                                        {
+                                            @foreach (var sub2 in permissions.Where(p => p.ParentID == sub.PermissionId))
+                                            {
+                                                <div class="form-check form-check-secondary mt-3">
+                                                    <input @((SelectedPermissions.Any(p => p == sub2.PermissionId) ? "checked" : "")) class="form-check-input" type="checkbox" name="SelectedPermission" value="@sub2.PermissionId" id="customCheckPrimary">
+                                                    <label class="form-check-label">@sub2.PermissionTitle</label>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

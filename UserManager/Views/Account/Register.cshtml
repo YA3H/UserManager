@@ -1,0 +1,20 @@
+﻿@model UserManager.Core.ViewModel.User.RegisterUserViewModel
+@{
+    ViewData["Title"] = "اطلاعات کاربری";
+    Layout = "~/Views/Shared/Account/_AccountLayout.cshtml";
+}
+
+<h4 class="mb-3 secondary-font text-center">لطفا اطلاعات خود را وارد کنید</h4>
+<form asp-action="Register" class="mb-3" method="post">
+    <input asp-for="Phone" type="hidden" class="form-control phone-number-mask text-end" maxlength="10" value="@User.Identity.Name">
+    <div class="mb-3">
+        <label class="form-label"> @Html.DisplayNameFor(model => model.Name) </label>
+        <input asp-for="Name" type="text" class="form-control text-start" placeholder="نام خود را وارد کنید" autofocus dir="ltr">
+    </div>
+    <div class="mb-3">
+        <label class="form-label"> @Html.DisplayNameFor(model => model.Family) </label>
+        <input asp-for="Family" type="text" class="form-control text-start " placeholder="نام خانوادگی خود را وارد کنید" dir="ltr">
+    </div>
+    <button class="btn rounded-pill btn-dark d-grid w-100">تمام!</button>
+</form>
+

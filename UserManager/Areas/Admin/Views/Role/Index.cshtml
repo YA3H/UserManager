@@ -1,0 +1,152 @@
+﻿@using UserManager.Core.Convertors
+@model UserManager.Core.ViewModel.Permissions.ListRoleViewModel
+@{
+    ViewData["Title"] = "نقش ها";
+    ViewData["Panel"] = "Role";
+    Layout = "~/Areas/Admin/Views/Shared/_DefaultLayout.cshtml";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="lh-1-85 breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Admin/Dashboard">خانه</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Admin/Roles">نقش ها</a>
+        </li>
+        <li class="breadcrumb-item active">لیست نقش ها</li>
+    </ol>
+</nav>
+<div class="card">
+    <h5 class="card-header heading-color">لیست نقش ها (@Model.Page.Count) </h5>
+    <div class="row">
+        <div class="col-md-3 mb-1">
+            <form method="get">
+                <div class="input-group input-group-sm">
+                    <select name="Row" asp-items="@ViewBag.RowList" class="form-select form-select-sm text-center" id="Row" aria-label="Example select with button addon">
+                    </select>
+                    <input type="hidden" class="form-control" name="Search" value="@Model.Page.Search" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="submit"><i class='bx bx-check'></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3 mb-1">
+            <form method="get">
+                <div class="input-group input-group-sm">
+                    <input type="hidden" class="form-control" name="Row" value="@Model.Page.Take" aria-describedby="button-addon2">
+                    <input name="Search" type="text" value="@Model.Page.Search" class="form-control text-center" placeholder="جستجو..." aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3 mb-1">
+            <div class="input-group input-group-sm">
+                <a href="/Admin/Roles/AddRole" class="btn btn-outline-secondary w-100">
+                    <span class="tf-icons bx bx-plus me-1"></span>افزودن نقش جدید
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-1">
+            <div class="input-group input-group-sm">
+                <span class="text-center w-100">نتایج: @Model.Page.Count</span>
+            </div>
+        </div>
+    </div>
+    <div class="row @*border-bottom*@ p-sm-3">
+        <div class="col-xl-12 col-lg-12">
+            <div class="table-responsive text-nowrap">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a asp-area="Admin"
+                                   asp-controller="Roles"
+                                   asp-route-Search="@Model.Page.Search"
+                                   asp-route-Row="@Model.Page.Take"
+                                   asp-route-Sort="RoleTitle"
+                                   asp-route-SortDesc="@((!Model.Page.SortDesc))">
+                                    @Html.DisplayNameFor(model => model.Roles[0].RoleTitle)
+                                    @if (Model.Page.Sort == "RoleTitle")
+                                    {
+                                        <i class='bx @((Model.Page.SortDesc==true?"bx-chevron-down":"bx-chevron-up")) '></i>
+                                    }
+                                </a>
+                            </th>
+
+                            <th>
+                                <a asp-area="Admin"
+                                   asp-controller="Roles"
+                                   asp-route-Search="@Model.Page.Search"
+                                   asp-route-Row="@Model.Page.Take"
+                                   asp-route-Sort="Rank"
+                                   asp-route-SortDesc="@((!Model.Page.SortDesc))">
+                                    @Html.DisplayNameFor(model => model.Roles[0].Rank)
+                                    @if (Model.Page.Sort == "Rank")
+                                    {
+                                        <i class='bx @((Model.Page.SortDesc==true?"bx-chevron-down":"bx-chevron-up")) '></i>
+                                    }
+                                </a>
+                            </th>
+
+                            <th class="text-end">‌عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                        @foreach (var item in Model.Roles)
+                        {
+                        <tr>
+                            <td>
+                                <strong>@item.RoleTitle</strong>
+                            </td>
+                            <td>
+                                <strong>@item.Rank</strong>
+                            </td>
+                            <td class="text-end">
+                                <a href="/Admin/Roles/EditRole/@item.RoleId" class="mt-1 btn btn-icon btn-label-secondary">
+                                    <i class="bx bx-edit"></i>
+                                </a>
+                                <a href="/Admin/Roles/DeleteRole/@item.RoleId" class="mt-1 btn btn-icon btn-label-warning">
+                                    <i class='bx bx-trash'></i>
+                                </a>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <hr class="">
+        <div class="row p-sm-3 p-0">
+            <div class="col-xl-12 col-lg-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-center pagination-secondary">
+                        @foreach (var item in Model.Pagings)
+                        {
+                            <li class="page-item @((item.Class=="bx bx-chevron-right"? "next" : ""))
+                                @((item.Class=="bx bx-chevron-left"? "prev" : ""))
+                                @((item.Active==true? "active" : ""))">
+                                <a class="page-link @((item.Enable != true ? "disabled" : "")) "
+                                   asp-area="Admin"
+                                   asp-controller="Roles"
+                                   asp-route-Search="@Model.Page.Search"
+                                   asp-route-Row="@Model.Page.Take"
+                                   asp-route-Sort="@Model.Page.Sort"
+                                   asp-route-SortDesc="@Model.Page.SortDesc"
+                                   asp-route-Page="@item.PageLink">
+                                    @item.PageText
+                                    @if (item.Class != string.Empty)
+                                    {
+                                        <i class="tf-icon @item.Class"></i>
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+

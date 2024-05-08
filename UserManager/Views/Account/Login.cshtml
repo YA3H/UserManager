@@ -1,0 +1,35 @@
+﻿@model UserManager.Core.ViewModel.User.LoginViewModel
+@{
+    ViewData["Title"] = "ورود - ثبت نام";
+    Layout = "~/Views/Shared/Account/_AccountLayout.cshtml";
+}
+
+<h4 class="mb-3 secondary-font text-center">به هزار و یک خوش‌آمدید!</h4>
+<p class="mb-4 text-center">برای ورود یا ثبت نام لطفا شماره تلفن خود را وارد کنید.</p>
+<form asp-action="Login" class="mb-3" method="post">
+    <div class="mb-3">
+        <label class="form-label "> @Html.DisplayNameFor(model => model.Phone) </label>
+        <div class="input-group">
+            <input asp-for="Phone" type="text" class="form-control phone-number-mask text-end  text-center" maxlength="11">
+        </div>
+        <span asp-validation-for="Phone" class="text-danger text-center"></span>
+    </div>
+    <div class="mb-3">
+        <div class="form-check form-check-warning">
+            <input asp-for="RememberMe" class="form-check-input form-check-warning" type="checkbox" id="remember-me">
+            <label asp-for="RememberMe" class="form-check-label" for="remember-me"> @Html.DisplayNameFor(model => model.RememberMe) </label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <button class="btn rounded-pill btn-dark d-grid w-100" type="submit"> ثبت نام / ورود</button>
+    </div>
+</form>
+
+<p class="text-center small">
+    <span>ورود شما به معنای پذیرش </span>
+    <a class="text-warning" href="/P">
+        <span>قوانین</span>
+    </a>
+    <span> هزار و یک‌ است.</span>
+</p>
+

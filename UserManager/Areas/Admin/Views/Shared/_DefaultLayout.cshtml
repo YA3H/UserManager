@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="fa" class="light-style layout-navbar-fixed layout-menu-fixed" dir="rtl" data-theme="theme-default" data-assets-path="~/assets/" data-template="vertical-menu-template-no-customizer-starter">
+
+<head>
+
+    <title>پنل مدیریت |  @ViewData["Title"]</title>
+    <partial name="_MetaTags" />
+    <partial name="_Styles" />
+    <partial name="_HeaderScripts" />
+
+</head>
+
+<body>
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+            <partial name="_RightMenu" />
+            
+            <div class="layout-page">
+                <partial name="_Headers" />
+                <div class="content-wrapper">
+                    <div class="container-xxl flex-grow-1 container-p-y">
+                        <div class="row">
+
+                            @RenderBody()
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layout-overlay layout-menu-toggle"></div>
+        <div class="drag-target"></div>
+    </div>
+
+
+    <partial name="_Scripts" />
+    @RenderSection("Scripts", false)
+</body>
+
+</html>

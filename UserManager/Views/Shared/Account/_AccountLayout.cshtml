@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="fa" class="light-style customizer-hide" dir="rtl" data-theme="theme-default" data-assets-path="../../assets/" data-template="vertical-menu-template">
+
+<head>
+    <partial name="Account/_AccountMetaTags" />
+    <title>مدیریت کاربران |  @ViewData["Title"]</title>
+    <partial name="Account/_AccountStyles" />
+    <partial name="Account/_AccountHeaderScripts" />
+</head>
+
+<body>
+    <div class="authentication-wrapper authentication-basic px-4">
+        <div class="authentication-inner py-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="app-brand justify-content-center">
+                        <a href="index.html" class="app-brand-link gap-2">
+                            <span class="app-brand-logo demo">
+                                logo
+                            </span>
+                            <span class="app-brand-text demo h3 mb-0 fw-bold">مدیریت کاربران‌</span>
+                        </a>
+                    </div>
+
+                    @RenderBody()
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <partial name="Account/_AccountScripts" />
+    @RenderSection("Scripts", false)
+</body>
+
+</html>

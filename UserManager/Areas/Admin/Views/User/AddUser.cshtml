@@ -1,0 +1,133 @@
+﻿@model UserManager.Core.ViewModel.User.CreateUserViewModel
+@using UserManager.Core.ViewModel.Permissions
+@{
+    ViewData["Title"] = "افزون کاربر";
+    ViewData["Panel"] = "User";
+    Layout = "~/Areas/Admin/Views/Shared/_DefaultLayout.cshtml";
+    List<OneRoleViewModel> Roles = ViewData["Roles"] as List<OneRoleViewModel>;
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="lh-1-85 breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/Admin/Dashboard">خانه</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Admin/Users">کاربران</a>
+        </li>
+        <li class="breadcrumb-item active">افزودن کاربر </li>
+    </ol>
+</nav>
+<form asp-action="AddUser" method="post" enctype="multipart/form-data">
+    <div class="row">
+
+        <div class="col-md-8 col-12">
+            <div class="card">
+                <h5 class="card-header heading-color">مشخصات کاربر</h5>
+                <div class="card-body">
+
+                    <div class="mb-3 col-md-12">
+                        <label class="form-label" for="phoneNumber">شماره تلفن</label>
+                        <div class="input-group input-group-merge">
+                            <input asp-for="Phone" type="text" maxlength="11" class="form-control text-start" placeholder="0912 XXX XXXX" dir="ltr">
+
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">نام</label>
+                        <input asp-for="Name" type="text" class="form-control" placeholder="نام کاربر را وارد کنید" aria-describedby="defaultFormControlHelp">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">نام خانوادگی</label>
+                        <input asp-for="Family" type="text" class="form-control" placeholder="نام خانوادگی کاربر را وارد کنید" aria-describedby="defaultFormControlHelp">
+                    </div>
+
+
+                </div>
+
+                <h5 class="card-header heading-color"> نقش های کاربر</h5>
+                <div class="card-body">
+
+                    @foreach (var item in Roles)
+                    {
+                        <div class="form-check form-check-secondary mt-3">
+                            <input class="form-check-input" type="checkbox" name="SelectedRoles" value="@item.RoleId">
+                            <label class="form-check-label">@item.RoleTitle</label>
+                        </div>
+                    }
+
+
+                    <span asp-validation-for="Phone" class="text-danger text-center"></span>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-12">
+            <div class="card mb-md-0 mb-4">
+
+                <h5 class="card-header heading-color"> آواتار کاربر</h5>
+                <div class="card-body">
+                    <img for="Avatar" id="imgAvatar" class="img-fluid d-flex mx-auto my-4 rounded" src="~/assets/img/avatars/1.jpg" alt="Card image cap">
+                    <label for="Avatar" class="btn btn-primary me-2 mb-4  d-flex mx-auto my-4" tabindex="0">
+                        <span class="d-none d-sm-block">انتخاب تصویر جدید</span>
+                        <i class="bx bx-upload d-block d-sm-none"></i>
+                        <input asp-for="Avatar" type="file" id="Avatar" class="account-file-input" hidden accept="image/png, image/jpeg">
+                    </label>
+                </div>
+
+
+                <h5 class="card-header heading-color"> هدر کاربر</h5>
+                <div class="card-body">
+
+                        <input asp-for="HeaderImage" type="file" id="HeaderImage" class="account-file-input" accept="image/png, image/jpeg">
+                    
+
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">ثبت</button>
+                        <a href="/Admin/Users" class="btn btn-primary">انصراف</a>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+{
+    <script>
+        function readURL(input) {
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#imgAvatar').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#Avatar").change(function() {
+            readURL(this);
+        });
+
+
+    </script>
+}
