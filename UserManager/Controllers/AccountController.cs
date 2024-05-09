@@ -99,12 +99,12 @@ namespace UserManager.Controllers
                     ConfirmViewModel confirm = _userService.LoginUser(_userService.GetUserPhoneByToken(Token));
                     if (confirm != null)
                     {
-                        if (!TimeChecker.CheckMinutes(confirm.ActiveCodeDate, 3))
+                        if (!TimeChecker.CheckHasTimeExpired(confirm.ActiveCodeDate, 3))
                         {
                             confirm.ActiveCode = string.Empty;
                             confirm.RememberMe = RememberMe;
-                            ViewBag.Min = TimeChecker.CheckPlusMinutes(confirm.ActiveCodeDate);
-                            ViewBag.Sec = TimeChecker.CheckPlusSeconds(confirm.ActiveCodeDate);
+                            ViewBag.Min = TimeChecker.CheckMinutesToExpiration(confirm.ActiveCodeDate);
+                            ViewBag.Sec = TimeChecker.CheckSecondsToExpiration(confirm.ActiveCodeDate);
                             return View(confirm);
                         }
                     }
@@ -125,7 +125,7 @@ namespace UserManager.Controllers
                     ConfirmViewModel login = _userService.LoginUser(_userService.GetUserPhoneByToken(confirm.Token));
                     if (login != null)
                     {
-                        if (!TimeChecker.CheckMinutes(login.ActiveCodeDate, 3))
+                        if (!TimeChecker.CheckHasTimeExpired(login.ActiveCodeDate, 3))
                         {
                             if (confirm.ActiveCode == login.ActiveCode || confirm.ActiveCode == "123456")
                             {
@@ -174,8 +174,8 @@ namespace UserManager.Controllers
                 }
 
             }
-            ViewBag.Min = TimeChecker.CheckPlusMinutes(confirm.ActiveCodeDate);
-            ViewBag.Sec = TimeChecker.CheckPlusSeconds(confirm.ActiveCodeDate);
+            ViewBag.Min = TimeChecker.CheckMinutesToExpiration(confirm.ActiveCodeDate);
+            ViewBag.Sec = TimeChecker.CheckSecondsToExpiration(confirm.ActiveCodeDate);
             return View(confirm);
         }
 

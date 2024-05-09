@@ -22,9 +22,9 @@ namespace UserManager.Data.Entities.Permissions
         #region Relations
 
         [ForeignKey("ParentID")]
-        public List<Permission> Permissions { get; set; }
+        public List<Permission> Permissions { get; set; } = new List<Permission>();
 
-        public List<RolePermission> RolePermissions { get; set; }
+        public List<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
 
         #endregion
     }

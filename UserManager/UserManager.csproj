@@ -33,8 +33,4 @@
     <ProjectReference Include="..\UserManager.Data\UserManager.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\UserHeaders\" />
-  </ItemGroup>
-
 </Project>

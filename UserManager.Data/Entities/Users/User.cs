@@ -54,9 +54,9 @@ namespace UserManager.Data.Entities.Users
 
         public virtual List<UserRole> UserRoles { get; set; }
 
-        public List<UserWorks> UserWorks { get; set; }
-        public List<WorkHours> WorkHours { get; set; }
-        public List<Work> Works { get; set; }
+        public List<UserWorks> UserWorks { get; set; } = new List<UserWorks>();
+        public List<WorkHours> WorkHours { get; set; } = new List<WorkHours>();
+        public List<Work> Works { get; set; } = new List<Work>();
 
         #endregion
     }

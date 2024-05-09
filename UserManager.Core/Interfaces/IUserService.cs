@@ -21,6 +21,7 @@ namespace UserManager.Core.Interfaces
         EditUserViewModel GetUserForShowInEditMode(int userId);
 
         bool IsExistPhone(string Phone);
+        bool IsExistUserId(int UserId);
         bool IsExistToken(string Token);
         bool IsBlock(int UserId);
         bool IsActive(int UserId);

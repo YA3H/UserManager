@@ -48,7 +48,7 @@ namespace UserManager.Core.ViewModel.Work
         public int UserInWorkCount { get; set; }
     }
 
-    public class SetSupervisorViewModel
+    public class SelectionOfSupervisorViewModel
     {
         public int UserId { get; set; }
 

@@ -80,7 +80,7 @@ namespace UserManager.Core.Services
             var workers = await _context.Users //operators | users 
                 .Include(u => u.UserRoles)
                 .Where(x => users.Contains(x.UserId))
-                .Select(u => new SetSupervisorViewModel()
+                .Select(u => new SelectionOfSupervisorViewModel()
                 {
                     UserId = u.UserId,
                     Rank = u.UserRoles.Any() ? u.UserRoles.Min(x => x.Role.Rank) : 9999,
@@ -309,6 +309,8 @@ namespace UserManager.Core.Services
                                    x.UserWorks.FirstOrDefault().UserId,
 
                     //اینو نفهمیدم چیه دیدی تو تلگرام بفرست چیه؟
+                    //برای دکمه ثبت ساعت شروع و پایان هست که دکمه شروع باشه یا پایان
+                    //البته فقط بخاطر متن دکمه اگر متن دکمه رو ثبت ساعت بزاریم تاثیری نداره!
                     StartOrEnd = x.WorkHours.Any(w => w.UserId == UserId && w.IsEnd == false)
                 })
                 .ToList();
@@ -379,14 +381,14 @@ namespace UserManager.Core.Services
                     UserId = u.User.UserId,
                     AvatarByte = u.User.Avatar,
                     Supervisor = u.Supervisor,
-                    WorkTime = TimeChecker.SumDateList(s.WorkHours.Where(w => w.UserId == u.UserId && w.IsEnd == true)
+                    WorkTime = TimeChecker.SumOfDates(s.WorkHours.Where(w => w.UserId == u.UserId && w.IsEnd == true)
                     .Select(x => new WorkHourseViewModel() { TimeStart = x.TimeStart, TimeEnd = x.TimeEnd }).ToList())
                 }).ToList()
             }).FirstOrDefault();
 
             if (workAccountant.Users != null)
             {
-                workAccountant.AllWorkTime = TimeChecker.SumDateAll(workAccountant.Users.Select(s => s.WorkTime).ToList());
+                workAccountant.AllWorkTime = TimeChecker.FinalSumOfDates(workAccountant.Users.Select(s => s.WorkTime).ToList());
             }
             return await Task.FromResult(workAccountant);
         }

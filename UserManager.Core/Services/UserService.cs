@@ -13,6 +13,7 @@ using UserManager.Core.ViewModel.User;
 using UserManager.Data.Context;
 using UserManager.Data.Entities.Users;
 
+
 namespace UserManager.Core.Services
 {
     public class UserService : IUserService
@@ -94,7 +95,7 @@ namespace UserManager.Core.Services
 
         public bool IsActiveCodeCheckMinutes(int UserId, int min)
         {
-            return TimeChecker.CheckMinutes(_context.Users.Single(u => u.UserId == UserId).ActiveCodeDate, min);
+            return TimeChecker.CheckHasTimeExpired(_context.Users.Single(u => u.UserId == UserId).ActiveCodeDate, min);
         }
 
         public bool IsBlock(int UserId)
@@ -105,6 +106,10 @@ namespace UserManager.Core.Services
         public bool IsExistPhone(string Phone)
         {
             return _context.Users.Any(u => u.Phone == Phone);
+        }
+        public bool IsExistUserId(int UserId)
+        {
+            return _context.Users.Any(u => u.UserId == UserId);
         }
 
         public bool IsExistToken(string Token)
@@ -250,15 +255,18 @@ namespace UserManager.Core.Services
                 Token = Guid.NewGuid().ToString(),
                 ActiveCodeDate = DateTime.Now,
                 IsDelete = false,
-                HeaderImage = "Header.jpg", //عکس هدر از فرانت نمیاد!
-
+                
                 Avatar = ImageConvertor.GetBytes(user.Avatar),
 
             };
 
             #region Save Header
 
-            if (user.HeaderImage != null) //در اینجا همیشه درسته
+            if (user.HeaderImage == null) //در اینجا همیشه درسته
+            {
+                addUser.HeaderImage = "Default_Header.jpg";
+            }
+            else
             {
                 string imagePath = "";
                 addUser.HeaderImage = NameGenerator.GenerateUniqCode() + Path.GetExtension(user.HeaderImage.FileName);
@@ -303,7 +311,8 @@ namespace UserManager.Core.Services
             {
                 //????
                 //دلیل این شرط چیه؟
-                if (EditUser.HeaderImage != "Header.jpg")
+                // عکس هدر پیشفرض رو پاک نکنه
+                if (EditUser.HeaderImage != "Default_Header.jpg")
                 {
                     string deletePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserAvatar", EditUser.HeaderImage);
                     if (File.Exists(deletePath))
@@ -315,6 +324,11 @@ namespace UserManager.Core.Services
                 // وجود فایل چک نشده، هر چند احتمالش کمه
                 // بین اسم فایل و اکستنشن نقطه نیست
                 user.HeaderImage = NameGenerator.GenerateUniqCode() + Path.GetExtension(EditUser.HeaderImageFile.FileName);
+                while (File.Exists(user.HeaderImage))
+                {
+                    user.HeaderImage = NameGenerator.GenerateUniqCode() + Path.GetExtension(EditUser.HeaderImageFile.FileName);
+                }
+                
 
                 //Directory.GetCurrentDirectory() 
                 //برای زمانی خوبه که فرانت و بک کنار هم باشند.
@@ -339,10 +353,13 @@ namespace UserManager.Core.Services
 
         public void DeleteUser(int userId)
         {
-            User user = GetUserById(userId);
             //اگه یوزر نال بود؟
-            user.IsDelete = true;
-            UpdateUser(user);
+            if (IsExistUserId(userId))
+            {
+                User user = GetUserById(userId);
+                user.IsDelete = true;
+                UpdateUser(user);
+            }
         }
 
         public Task<List<UserInWorkViewModel>> GetAllUserForWorks()

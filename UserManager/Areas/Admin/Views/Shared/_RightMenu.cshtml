@@ -1,4 +1,11 @@
-﻿<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+﻿@{ 
+    //برطرف شد
+    if (ViewData["Panel"]==null)
+    {
+        ViewData["Panel"] = "Dashboard";
+    }
+}
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="Index.html" class="app-brand-link">
             <span class="app-brand-logo demo">

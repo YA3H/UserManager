@@ -12,7 +12,7 @@ namespace UserManager.Core.Generator
         //نام متدها مبهم است!
         //باید واضح باشه که چیو چک میکنه.
         //(بدون دیدن کد)
-        public static bool CheckMinutes(DateTime datetime, int min)
+        public static bool CheckHasTimeExpired(DateTime datetime, int min)
         {
             DateTime time = datetime.AddMinutes(min);
             if (time < DateTime.Now)
@@ -25,34 +25,34 @@ namespace UserManager.Core.Generator
             }
         }
 
-        public static int CheckPlusMinutes(DateTime datetime)
+        public static int CheckMinutesToExpiration(DateTime datetime)
         {
             TimeSpan Time = DateTime.Now - datetime.AddMinutes(3);
             return Math.Abs(Time.Minutes);
         }
 
-        public static int CheckPlusSeconds(DateTime datetime)
+        public static int CheckSecondsToExpiration(DateTime datetime)
         {
             TimeSpan Time = DateTime.Now - datetime.AddMinutes(3);
             return Math.Abs(Time.Seconds);
         }
 
-        public static TimeSpan SumDate(DateTime StartDate, DateTime EndDate)
+        public static TimeSpan SumOfTwoDates(DateTime StartDate, DateTime EndDate)
         {
             TimeSpan Time = StartDate - EndDate;
             return Time;
         }
-        public static TimeSpan SumDateList(List<WorkHourseViewModel> models)
+        public static TimeSpan SumOfDates(List<WorkHourseViewModel> models)
         {
             TimeSpan Time = new TimeSpan();
             foreach (var item in models)
             {
-                Time = Time + SumDate(item.TimeStart, item.TimeEnd);
+                Time = Time + SumOfTwoDates(item.TimeStart, item.TimeEnd);
             }
             return Time;
         }
 
-        public static TimeSpan SumDateAll(List<TimeSpan> models)
+        public static TimeSpan FinalSumOfDates(List<TimeSpan> models)
         {
             TimeSpan Time = new TimeSpan();
             foreach (var item in models)
